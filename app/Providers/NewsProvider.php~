@@ -1,0 +1,101 @@
+<?php
+namespace App\Providers;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\View;
+use Illuminate\Support\ServiceProvider;
+class NewsProvider extends ServiceProvider
+{
+    /**
+     * Register services.
+     */
+    public function register(): void
+    {
+        //
+    }
+    /**
+     * Bootstrap services.
+     */
+    public function boot()
+    {
+        $apiKey = config('services.newsapi.key');
+        // Cache breaking news voor 5 minuten
+        $brNews = Cache::remember('brNews', now()->addMinutes(5), function () use ($apiKey) {
+            return $this->fetchBreakingNews($apiKey);
+        });
+        $allNews = Cache::remember('allNews', now()->addMinutes(5), function () use ($apiKey) {
+            return $this->fetchAllNews($apiKey);
+        });
+        $singleNews = Cache::remember('singleNews', now()->addMinutes(5), function () use ($apiKey) {
+            return $this->singleNews($apiKey);
+        });
+
+        View::share('brNews', $brNews);
+        View::share('allNews', $allNews);
+        View::share('singleNews', $singleNews);
+    }
+    private function fetchBreakingNews($apiKey)
+    {
+        $response = Http::withoutVerifying()->get('https://newsapi.org/v2/top-headlines', [
+            'country' => 'us',
+            'category' => 'general',
+            'apiKey' => $apiKey,
+        ]);
+        $articlesBreaking = $response->json()['articles'] ?? [];
+        // Converteer naar een eenvoudiger array
+        return collect($articlesBreaking)->map(function ($article) {
+            return [
+                'title' => $article['title'] ?? 'Geen titel',
+                'url' => $article['url'] ?? '#',
+                'description' => $article['description'] ?? 'Geen beschrijving',
+                'author' => $article['author'] ?? 'Onbekend',
+                'source' => $article['source']['name'] ?? 'Onbekend',
+                'image' => $article['urlToImage'] ?? 'https://via.placeholder.com/150',
+                'publishedAt' => isset($article['publishedAt']) ? date('H:i', strtotime($article['publishedAt'])) : 'Onbekend',
+            ];
+        })->take(10); // Haal alleen de laatste 10 nieuwsberichten
+    }
+
+    private function fetchAllNews($apiKey) {
+        $response = Http::withoutVerifying()->get('https://newsapi.org/v2/everything', [
+            'q' => 'aviation',
+            'sortBy' => 'popularity',
+            'apiKey' => $apiKey,
+        ]);
+        $articlesAll = $response->json()['articles'] ?? [];
+
+        return collect($articlesAll)->map(function ($article) {
+            return [
+                'title' => $article['title'] ?? 'Geen titel',
+                'url' => $article['url'] ?? '#',
+                'description' => $article['description'] ?? 'Geen beschrijving',
+                'author' => $article['author'] ?? 'Onbekend',
+                'source' => $article['source']['name'] ?? 'Onbekend',
+                'image' => $article['urlToImage'] ?? 'https://via.placeholder.com/150',
+                'publishedAt' => isset($article['publishedAt']) ? date('H:i', strtotime($article['publishedAt'])) : 'Onbekend',
+            ];
+        })->take(10);
+    }
+
+    private function singleNews($apiKey) {
+        $response = Http::withoutVerifying()->get('https://newsapi.org/v2/everything', [
+            'q' => 'aviation',
+            'sortBy' => 'publishedAt',
+            'apiKey' => $apiKey,
+        ]);
+        $articlesAll = $response->json()['articles'] ?? [];
+        dd($articlesAll);
+
+        return collect($articlesAll)->map(function ($article) {
+            return [
+                'title' => $article['title'] ?? 'Geen titel',
+                'url' => $article['url'] ?? '#',
+                'description' => $article['description'] ?? 'Geen beschrijving',
+                'author' => $article['author'] ?? 'Onbekend',
+                'source' => $article['source']['name'] ?? 'Onbekend',
+                'image' => $article['urlToImage'] ?? 'https://via.placeholder.com/150',
+                'publishedAt' => isset($article['publishedAt']) ? date('H:i', strtotime($article['publishedAt'])) : 'Onbekend',
+            ];
+        })->take(1);
+    }
+}

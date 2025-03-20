@@ -1,0 +1,24 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Post;
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+
+class BackendController extends Controller
+{
+    //caching wordt gebruikt om het aantal databasequeries te verminderen
+    public function index(){
+        $totalUsers = Cache::remember('totalUsers',600, fn()=> User::count());
+        $activeUsers = Cache::remember('activeUsers',600, fn()=> User::where('is_active',1)->count());
+        $inactiveUsers = $totalUsers - $activeUsers;
+
+        $totalPosts = Cache::remember('totalPosts',600, fn()=> Post::count());
+        $publishedPosts = Cache::remember('publishedPosts',600, fn()=> User::where('is_published',1)->count());
+        $unpublishedPosts = $totalPosts - $publishedPosts;
+
+        return view('backend.index', compact('totalUsers','activeUsers','inactiveUsers','totalPosts','publishedPosts','unpublishedPosts'));
+    }
+}
