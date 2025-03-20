@@ -23,7 +23,7 @@
     <div class="single-post-contents">
         <div class="container">
             <div class="row justify-content-center">
-                <div class="col-12 col-md-8">
+                <div class="col-12">
                     <div class="single-post-text">
                         <p>{{$post->content}}</p>
                     </div>

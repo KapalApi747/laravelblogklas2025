@@ -3,14 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
+use App\Models\PostComment;
 
 class FrontendPostController extends Controller
 {
-    //
-
-    public function show(Post $post)
+    public function show($id)
     {
-
-        return view('frontend.post', compact('post'));
+        $post = Post::findOrFail($id);
+        $comments = $post->comments()->whereNull('parent_id')->with('user.photo','children.user.photo')->get();
+        return view('frontend.post', compact('post', 'comments'));
     }
 }

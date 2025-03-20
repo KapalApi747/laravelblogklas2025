@@ -11,7 +11,7 @@
                         </a>
                     @endforeach
                 </div>
-                <h3><a href="{{route('frontend.post.show',$news)}}" class="font-pt">{{$news->title}}</a></h3>
+                <h3><a href="{{route('frontend.post.show',$news->id)}}" class="font-pt">{{$news->title}}</a></h3>
                 <div class="date">
                     <a href="#">{{$news->created_at->format('M d, Y')}}</a>
                 </div>

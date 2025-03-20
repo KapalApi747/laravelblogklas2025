@@ -4,6 +4,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\FrontendPostController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\PostCommentController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
@@ -12,7 +13,8 @@ use Illuminate\Support\Facades\Route;
 // frontend
 
 Route::get('/', [HomeController::class, 'index'])->name('frontend.home');
-Route::get('/posts/{post:slug}', [FrontendPostController::class, 'show'])->name('frontend.post.show');
+Route::get('/posts/{post}', [FrontendPostController::class, 'show'])->name('frontend.post.show');
+
 // Route voor het contactformulier
 Route::get('/contact', [ContactController::class, 'create'])->name('contact.create');
 Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
@@ -38,7 +40,7 @@ Route::group(['prefix' => 'backend', 'middleware' => ['auth', 'admin', 'verified
 Route::group(['prefix' => 'backend', 'middleware' => ['auth', 'verified']], function () {
     Route::resource('/posts', PostController::class)->scoped(['post' => 'slug']);
     Route::get('/posts/export/{format}', [PostController::class, 'exportAll'])->name('posts.export');
-    //    Route::get('/posts/export/{format}/{id}', [PostController::class, 'exportOnePost'])->name('posts.export');
+    Route::get('/posts/{id}/export/{format}', [PostController::class, 'exportOnePost'])->name('post.export');
 });
 
 Route::get('/backend', function () {
@@ -49,6 +51,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    Route::post('/posts/{id}/comments', [PostCommentController::class, 'store'])->name('comments.store');
 });
 
 require __DIR__.'/auth.php';

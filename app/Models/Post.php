@@ -86,5 +86,10 @@ class Post extends Model
         return $query;
     }
 
+    public function comments()
+    {
+        return $this->hasMany(PostComment::class);
+    }
+
     //
 }
