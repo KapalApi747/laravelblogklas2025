@@ -16,7 +16,7 @@
                                     <div class="comment-wrapper d-md-flex align-items-start">
                                         <!-- Comment Meta -->
                                         <div class="comment-author">
-                                            <img src="{{ $comment->user->photo ? asset('assets/img/' . $comment->user->photo->path) : asset('assets/frontend/img/core-img/favicon.ico') }}" alt="">
+                                            <img src="{{ $comment->user->photo->path ? asset('assets/img/' . $comment->user->photo->path) : asset('assets/frontend/img/core-img/favicon.ico') }}" alt="">
                                         </div>
                                         <!-- Comment Content -->
                                         <div class="comment-content">

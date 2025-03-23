@@ -24,6 +24,9 @@
                                             <span
                                                 class="comment-date font-pt">{{ $comment->created_at->format('F j, Y') }}
                                             </span>
+                                            @if(isset($comment->parent->user))
+                                                <span class="text-gray-500">@ {{ $comment->parent->user->name }}</span>
+                                            @endif
                                             <p>{{ $comment->body }}</p>
                                             @auth
                                                 <a class="reply-btn" href="javascript:void(0);" data-comment-id="{{ $comment->id }}">
