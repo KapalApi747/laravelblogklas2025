@@ -1,3 +1,17 @@
+<style>
+    .single_comment_area .reply-btn {
+        background-color: #007bff; /* Custom background color */
+        color: #fff; /* Custom text color */
+        padding: 10px 20px; /* Adjust padding */
+        border-radius: 5px; /* Adjust border radius */
+        border: none;
+    }
+
+    .single_comment_area .reply-btn:hover {
+        background-color: #0056b3; /* Custom hover color */
+    }
+</style>
+
 <section class="gazette-post-discussion-area section_padding_100 bg-gray">
     <div class="container">
         <div class="row justify-content-center">
@@ -24,11 +38,27 @@
                                             <span
                                                 class="comment-date font-pt">{{ $comment->created_at->format('F j, Y') }}
                                             </span>
-                                            <p>{{ $comment->body }}</p>
+                                            <div>
+                                                @if(isset($comment->parent->user))
+                                                    <strong>
+                                                        <span class="text-blue-500">@ {{ $comment->parent->user->name }}</span>
+                                                    </strong>
+                                                @endif
+                                            </div>
+                                            <p>
+                                                {{ $comment->body }}
+                                            </p>
                                             @auth
-                                                <a class="reply-btn" href="javascript:void(0);" data-comment-id="{{ $comment->id }}">
+                                                <a class="reply-btn btn btn-primary" href="javascript:void(0);" data-comment-id="{{ $comment->id }}">
                                                     Reply <i class="fa fa-reply"></i>
                                                 </a>
+
+                                                {{--Edit Button--}}
+                                                @if(auth()->id() === $comment->user_id)
+                                                    <a class="edit-btn text-warning" href="javascript:void(0);" data-comment-id="{{ $comment->id }}">
+                                                        Edit <i class="fa fa-edit"></i>
+                                                    </a>
+                                                @endif
 
                                                 <!-- Reply Form (Initially Hidden) -->
                                                 <div class="reply-form" id="reply-form-{{ $comment->id }}" style="display: none; margin-left: 20px;">
@@ -42,6 +72,21 @@
                                                         <button type="button" class="btn btn-secondary btn-sm cancel-reply" data-comment-id="{{ $comment->id }}">Cancel</button>
                                                     </form>
                                                 </div>
+
+                                                {{--Edit Form--}}
+                                                @if(auth()->id() === $comment->user_id)
+                                                    <div class="edit-form border p-2" id="edit-form-{{ $comment->id }}" style="display: none;">
+                                                        <form action="{{ route('comments.update', ['post' => $post->id, 'comment' => $comment->id]) }}" method="POST">
+                                                            @csrf
+                                                            @method('PATCH')
+                                                            <div class="form-group">
+                                                                <textarea class="form-control" name="body" rows="3">{{ $comment->body }}</textarea>
+                                                            </div>
+                                                            <button type="submit" class="btn btn-success btn-sm">Save</button>
+                                                            <button type="button" class="btn btn-secondary btn-sm cancel-edit" data-comment-id="{{ $comment->id }}">Cancel</button>
+                                                        </form>
+                                                    </div>
+                                                @endif
                                             @endauth
 
                                         </div>
@@ -57,36 +102,6 @@
                             </li>
                         @endforeach
                     </ol>
-
-                    {{--<!-- Reply Modal -->
-                    <div class="modal" id="replyModal" tabindex="-1" role="dialog" aria-labelledby="replyModalLabel"
-                         aria-hidden="true">
-                        <div class="modal-dialog" role="document">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="replyModalLabel">Reply to Comment</h5>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-                                <form action="{{ route('comments.store', $post->id) }}" method="POST">
-                                    @csrf
-                                    <input type="hidden" name="parent_id" id="parent_id">
-                                    <div class="modal-body">
-                                        <div class="form-group">
-                                                <textarea class="form-control" name="message" id="message" cols="30"
-                                                          rows="5" placeholder="Write your reply..."></textarea>
-                                        </div>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close
-                                        </button>
-                                        <button type="submit" class="btn btn-primary">Submit Reply</button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>--}}
                 </div>
 
                 <!-- Leave A Comment -->
@@ -123,18 +138,6 @@
 
 @section('scripts')
     <script>
-        /*$(document).ready(function() {
-            $('.reply-btn').click(function() {
-                var commentId = $(this).data('comment-id');  // Get the correct comment ID
-
-                // Set the hidden input field inside the modal to the correct parent ID
-                $('#parent_id').val(commentId);
-
-                // Show the reply modal
-                $('#replyModal').modal('show');
-            });
-        });*/
-
         $(document).ready(function() {
             console.log("jQuery is loaded and DOM is ready!"); // Debugging check
 
@@ -143,7 +146,11 @@
                 var commentId = $(this).data('comment-id');
                 console.log("Reply button clicked for comment ID:", commentId); // Debugging check
 
-                $('#reply-form-' + commentId).slideToggle(); // Show/Hide the reply form
+                // Hide any visible edit form
+                $('#edit-form-' + commentId).slideUp();
+
+                // Show/Hide the reply form
+                $('#reply-form-' + commentId).slideToggle();
             });
 
             // Cancel reply (hide the form)
@@ -153,8 +160,26 @@
 
                 $('#reply-form-' + commentId).slideUp(); // Hide the form
             });
+
+            // Show the edit form when "Edit" is clicked
+            $('.edit-btn').click(function() {
+                var commentId = $(this).data('comment-id');
+                console.log("Edit button clicked for comment ID:", commentId); // Debugging check
+
+                // Hide any visible reply form
+                $('#reply-form-' + commentId).slideUp();
+
+                // Toggle visibility of the edit form
+                $('#edit-form-' + commentId).slideToggle(); // Show/Hide the edit form
+            });
+
+            // Cancel edit (hide the edit form)
+            $('.cancel-edit').click(function() {
+                var commentId = $(this).data('comment-id');
+                console.log("Cancel edit button clicked for comment ID:", commentId); // Debugging check
+
+                $('#edit-form-' + commentId).slideUp(); // Hide the edit form
+            });
         });
-
-
     </script>
 @endsection

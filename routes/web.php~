@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Route;
 // frontend
 
 Route::get('/', [HomeController::class, 'index'])->name('frontend.home');
-Route::get('/posts/{slug}', [FrontendPostController::class, 'show'])->name('frontend.post.show');
+Route::get('/posts/{post}', [FrontendPostController::class, 'show'])->name('frontend.post.show');
 
 // Route voor het contactformulier
 Route::get('/contact', [ContactController::class, 'create'])->name('contact.create');
@@ -40,7 +40,7 @@ Route::group(['prefix' => 'backend', 'middleware' => ['auth', 'admin', 'verified
 Route::group(['prefix' => 'backend', 'middleware' => ['auth', 'verified']], function () {
     Route::resource('/posts', PostController::class)->scoped(['post' => 'slug']);
     Route::get('/posts/export/{format}', [PostController::class, 'exportAll'])->name('posts.export');
-    Route::get('/posts/{slug}/export/{format}', [PostController::class, 'exportOnePost'])->name('post.export');
+    Route::get('/posts/{id}/export/{format}', [PostController::class, 'exportOnePost'])->name('post.export');
 });
 
 Route::get('/backend', function () {
@@ -52,7 +52,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    Route::post('/posts/{slug}/comments', [PostCommentController::class, 'store'])->name('comments.store');
+    Route::post('/posts/{id}/comments', [PostCommentController::class, 'store'])->name('comments.store');
+    Route::patch('/posts/{post}/comments/{comment}', [PostCommentController::class, 'update'])->name('comments.update');
 });
 
 require __DIR__.'/auth.php';

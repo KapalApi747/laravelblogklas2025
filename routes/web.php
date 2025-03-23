@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Route;
 // frontend
 
 Route::get('/', [HomeController::class, 'index'])->name('frontend.home');
-Route::get('/posts/{id}', [FrontendPostController::class, 'show'])->name('frontend.post.show');
+Route::get('/posts/{post}', [FrontendPostController::class, 'show'])->name('frontend.post.show');
 
 // Route voor het contactformulier
 Route::get('/contact', [ContactController::class, 'create'])->name('contact.create');
@@ -52,7 +52,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    Route::post('/posts/{slug}/comments', [PostCommentController::class, 'store'])->name('comments.store');
+    Route::post('/posts/{post}/comments', [PostCommentController::class, 'store'])->name('comments.store');
+    Route::patch('/posts/{post}/comments/{comment}', [PostCommentController::class, 'update'])->name('comments.update');
 });
 
 require __DIR__.'/auth.php';
