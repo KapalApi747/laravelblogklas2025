@@ -1,11 +1,14 @@
 <li class="single_comment_area" style="margin-left: {{ $depth * 20 }}px;">
     <div class="comment-wrapper d-md-flex align-items-start">
         <div class="comment-author">
-            <img src="{{ $comment->user->photo ? asset('assets/img/' . $comment->user->photo->path) : asset('assets/frontend/img/core-img/favicon.ico') }}" alt="">
+            <img src="{{ $comment->user->photo->path ? asset('assets/img/' . $comment->user->photo->path) : asset('assets/frontend/img/core-img/favicon.ico') }}" alt="">
         </div>
         <div class="comment-content">
             <h5>{{ $comment->user->name }}</h5>
             <span class="comment-date text-muted">{{ $comment->created_at->format('F j, Y') }}</span>
+            @if($comment->parent_id)
+                <span class="text-gray-500">@ {{ $comment->parent->user->name }}</span>
+            @endif
             <p>{{ $comment->body }}</p>
             @auth
                 <div class="mb-5">

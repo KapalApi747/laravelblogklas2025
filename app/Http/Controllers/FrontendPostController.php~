@@ -12,7 +12,7 @@ class FrontendPostController extends Controller
         $post = Post::where('id', $id)->firstOrFail();
         $comments = $post
             ->comments()
-            ->with('user.photo','children.user.photo','children.parent.user','parent.user.photo')
+            ->with('user.photo','children.user.photo','children.parent.user','children.parent.user.photo')
             ->whereNull('parent_id')
             ->get();
 

@@ -6,6 +6,9 @@
         <div class="comment-content">
             <h5>{{ $comment->user->name }}</h5>
             <span class="comment-date text-muted">{{ $comment->created_at->format('F j, Y') }}</span>
+            @if(isset($comment->parent->user))
+                <span class="text-gray-500">@ {{ $comment->parent->user->name }}</span>
+            @endif
             <p>{{ $comment->body }}</p>
             @auth
                 <div class="mb-5">
