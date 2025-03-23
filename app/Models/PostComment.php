@@ -25,10 +25,10 @@ class PostComment extends Model
     }
     //parent comment relation
     public function parent(){
-        return $this->belongsTo(PostComment::class,'parent_id', )->with('user');
+        return $this->belongsTo(PostComment::class,'parent_id');
     }
     //Child comments relation
     public function children(){
-        return $this->hasMany(PostComment::class, 'parent_id')->with('children', 'user');
+        return $this->hasMany(PostComment::class, 'parent_id') ->with('children');
     }
 }

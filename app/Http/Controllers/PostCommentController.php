@@ -65,18 +65,6 @@ class PostCommentController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    /*public function update(Post $post, PostComment $comment)
-    {
-        // The $post and $comment parameters are injected based on the route
-
-        // Check if the authenticated user is the owner of the comment
-        $this->authorize('update', $comment);
-
-        // Update the comment
-        $comment->update(request()->only('body'));
-
-        return redirect()->route('frontend.post.show', $post->id)->with('message', 'Comment updated successfully!');
-    }*/
 
     public function update(Request $request, Post $post, PostComment $comment)
     {

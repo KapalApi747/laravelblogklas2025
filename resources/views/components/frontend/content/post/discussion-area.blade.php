@@ -1,14 +1,14 @@
 <style>
     .single_comment_area .reply-btn {
-        background-color: #007bff; /* Custom background color */
-        color: #fff; /* Custom text color */
-        padding: 10px 20px; /* Adjust padding */
-        border-radius: 5px; /* Adjust border radius */
+        background-color: #007bff;
+        color: #fff;
+        padding: 10px 20px;
+        border-radius: 5px;
         border: none;
     }
 
     .single_comment_area .reply-btn:hover {
-        background-color: #0056b3; /* Custom hover color */
+        background-color: #0056b3;
     }
 </style>
 
@@ -30,7 +30,7 @@
                                     <div class="comment-wrapper d-md-flex align-items-start">
                                         <!-- Comment Meta -->
                                         <div class="comment-author">
-                                            <img src="{{ $comment->user->photo->path ? asset('assets/img/' . $comment->user->photo->path) : asset('assets/frontend/img/core-img/favicon.ico') }}" alt="">
+                                            <img src="{{ $comment->user->photo->path === 'https://placehold.co/640x480' ? 'https://placehold.co/60' : asset('assets/img/' . $comment->user->photo->path)}}" alt="">
                                         </div>
                                         <!-- Comment Content -->
                                         <div class="comment-content">
